@@ -1,0 +1,16 @@
+[tool.poetry]
+authors = ["James Lowry <jl@balkerne.com>"]
+description = ""
+name = "blog-api"
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+flask = "^3.0.3"
+flask-migrate = "^4.0.7"
+flask-sqlalchemy = "^3.1.1"
+python = "^3.12"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
