@@ -15,3 +15,11 @@
 
 - Users should be able to sign up, sign in
 - Requests to create, update, or delete blog posts should be authenticated by the user that owns the post
+
+
+## Running the application
+Run `flask --app api run` in blog_api directory
+
+## Running migrations for the application
+
+`flask db migrate -m "<migration_name>"`

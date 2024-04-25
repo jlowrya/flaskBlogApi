@@ -1,6 +1,3 @@
-
-from flask_sqlalchemy import SQLAlchemy
-
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
@@ -17,7 +14,7 @@ class BlogPost(db.Model):
    title: Mapped[str]
    subtitle: Mapped[Optional[str]]
    body: Mapped[str]
-   createdAt: Mapped[datetime.datetime] = mapped_column(server_default=func.UTC_TIMESTAMP())
+   created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
 
 
 
