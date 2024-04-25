@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
-import datetime
+from datetime import datetime, timezone
 from sqlalchemy import func
 
 
@@ -14,7 +14,8 @@ class BlogPost(db.Model):
    title: Mapped[str]
    subtitle: Mapped[Optional[str]]
    body: Mapped[str]
-   created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+   created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+   updated_at: Mapped[datetime] = mapped_column(onupdate=lambda : datetime.now(timezone.utc), server_default=func.now())
 
 
 
