@@ -1,6 +1,6 @@
 from blog_api.constants import app, db, login_manager
 from blog_api.models import BlogPost, User
-from flask import request
+from flask import request, render_template
 from flask_login import login_user, current_user, login_required, logout_user
 from sqlalchemy import update, and_
 import secrets
@@ -8,19 +8,21 @@ import secrets
 
 @app.get('/blogs')
 def list_blogs():
-    blogs = [{"id":blog.id, "title": blog.title, "subtitle": blog.subtitle, "body": blog.body, "created_at": blog.created_at} for blog in db.session.execute(db.select(BlogPost)).scalars()]
-    return blogs
+    blogs = [{"id":blog.id, "title": blog.title, "subtitle": blog.subtitle, "body": blog.body, "created_at": blog.created_at, "author": blog.author.username} for blog in db.session.execute(db.select(BlogPost)).scalars()]
+    return render_template('./blogs.html', blogs=blogs)
 
 @app.get('/blogs/<int:blog_id>')
 def get_blog(blog_id):
     res = db.get_or_404(BlogPost, blog_id)
-    return {
+    res = {
         "title": res.title,
         "subtitle": res.subtitle, 
         "body": res.body,
         "created_at": res.created_at,
-        "updated_at": res.updated_at
+        "updated_at": res.updated_at,
+        "author": res.author.username
     }
+    return render_template('./blog.html', blog=res) 
     
 @app.post("/blogs")
 @login_required

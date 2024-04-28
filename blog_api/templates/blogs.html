@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Welcome to blog world! Home of all the blogs!</h1>
+<div>
+    Login
+</div>
+
+<div id="blogs">
+    {% for blog in blogs %}
+    <div class="blog-overview">
+        <a href="{{ url_for( 'get_blog', blog_id=blog.id ) }}">
+        <p>{{blog.title}}</p></a>
+        <p>{{blog.subtitle}}</p>
+        <p>By {{blog.author}}</p>
+        
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

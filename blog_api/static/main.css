@@ -1,0 +1,10 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.blog-overview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
