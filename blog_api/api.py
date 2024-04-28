@@ -13,6 +13,16 @@ class BlogForm(FlaskForm):
     body = TextAreaField("Body")
     submit = SubmitField("Save Changes")
 
+class LoginForm(FlaskForm):
+    username = StringField("Username")
+    password = StringField("Password")
+    submit = SubmitField("Login")
+
+class SignupForm(FlaskForm):
+    username = StringField("Username")
+    password = StringField("Password")
+    password_repeat = StringField("Confirm password")
+    submit = SubmitField("Sign up")
 
 @app.get('/blogs')
 def list_blogs():
@@ -92,16 +102,17 @@ def signup():
 
 @app.get("/login")
 def get_login():
-    return render_template("./login.html")
+    form = LoginForm()
+    return render_template("./login.html", form=form)
 
 @app.post("/login")
 def login():
-    username, password = request.form.values()
+    username, password, submit = request.form.values()
     user = User.query.filter(and_(User.username==username, User.password==password)).first()
     if(user):
         #redirect to main page
         login_user(user, force=True)
-        return redirect("/blogs")
+        return redirect(url_for("get_profile", user_id=user.id))
     return redirect(url_for( 'get_login', retry=True))
 
 @app.get("/logout")
@@ -110,10 +121,30 @@ def logout():
     logout_user()
     return redirect("/blogs")
 
+@app.get("/sign-up")
+def sign_up_page():
+    form = SignupForm()
+    return render_template("./sign-up.html", form=form)
+
+@app.post("/sign-up")
+def sign_up():
+    form = request.form
+    new_user = User(username=form["username"], password=form["password"])
+    db.session.add(new_user)
+    db.session.commit()
+    return redirect(url_for("get_login"))
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter(User.id==int(user_id)).one()
+
+
+@app.get("/profile/<int:user_id>")
+@login_required
+def get_profile(user_id):
+    blogs = [{"id":blog.id, "title": blog.title, "subtitle": blog.subtitle, "body": blog.body, "created_at": blog.created_at, "author": blog.author.username} for blog in db.session.execute(db.select(BlogPost).filter(BlogPost.author_id==user_id)).scalars()]
+    return render_template("./profile.html", blogs=blogs)
 
 @app.get("/authstatus")
 def get_auth_status():

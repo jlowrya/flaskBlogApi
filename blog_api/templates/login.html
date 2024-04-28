@@ -3,12 +3,25 @@
 {% block content %}
 
 <div>
-    <form method="post">
-Login
-<input type="text" name="username" placeholder="username" value="{{ request.form['username'] }}"/>
-<input type="text" name="password" placeholder="password" value="{{ request.form['password']}}"/>
-<button type="submit">Submit</button>
-    </form>
+    <h1>Please log in</h1>
+<form method="POST">
+    <div>
+        {{ form.username.label }}:
+        {{form.username}}
+    </div>
+    <div>
+        {{ form.password.label }}:
+        {{ form.password }}
+    </div>
+    <div>
+        {{ form.submit }}
+    </div>
+    {% if retry %}
+    <p style="color: red;">Incorrect Credentials</p>
+    {% endif %}
+    <a href="{{ url_for( 'list_blogs') }}">Cancel</a>
+
+</form>
    
 </div>
 

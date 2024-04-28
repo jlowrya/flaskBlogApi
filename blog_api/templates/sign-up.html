@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div>
+    <form method="POST">
+        <div>
+            {{ form.username.label }}:
+            {{form.username}}
+        </div>
+        <div>
+            {{ form.password.label }}:
+            {{ form.password }}
+        </div>
+        <div>
+            {{ form.password_repeat.label }}:
+            {{ form.password_repeat }}
+        </div>
+        <div>
+            {{ form.submit }}
+        </div>
+        <a href="{{ url_for( 'list_blogs') }}">Cancel</a>
+
+    </form>
+
+</div>
+
+{% endblock %}

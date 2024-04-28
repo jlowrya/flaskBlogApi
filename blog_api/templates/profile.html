@@ -4,27 +4,27 @@
 
 <h1>Welcome to blog world! Home of all the blogs!</h1>
 <div>
-    {% if not current_user.is_authenticated %}
-    <a href="{{ url_for( 'get_login') }}">Login</a>
-    <a href="{{ url_for( 'sign_up_page') }}">Sign Up</a>
-    {% else %}
-    <p>Logged in as {{current_user.username}}</p>
-    <a href="{{ url_for('logout')}}">Logout</a>
+    <p>Hello {{current_user.username}}</p>
+    <a href="{{ url_for('list_blogs')}}">Home</a>
     <a href="{{ url_for('new_blog_form')}}">New Blog</a>
-    <a href="{{ url_for('get_profile', user_id=current_user.id)}}">Profile</a>
-    {% endif %}
+    <a href="{{ url_for('logout')}}">Logout</a>
 </div>
 
 <div id="blogs">
+    {% if not blogs %}
+    <p>Create a blog to see it here</p>
+    {% else %}
     {% for blog in blogs %}
     <div class="blog-overview">
         <a href="{{ url_for( 'get_blog', blog_id=blog.id ) }}">
-        <p>{{blog.title}}</p></a>
+            <p>{{blog.title}}</p>
+        </a>
         <p>{{blog.subtitle}}</p>
         <p>By {{blog.author}}</p>
-        
+
     </div>
     {% endfor %}
+    {% endif %}
 </div>
 
 {% endblock %}
