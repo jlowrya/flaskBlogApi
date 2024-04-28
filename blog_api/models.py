@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, List
 from datetime import datetime, timezone
 from sqlalchemy import func, ForeignKey
+from flask_login import current_user
 
 
 from blog_api.constants import db
@@ -18,7 +19,7 @@ class User(db.Model):
    @property
    def is_authenticated(self):
       #TODO: implement method
-      return True
+      return current_user.id==self.id
    
    @property
    def is_active(self):

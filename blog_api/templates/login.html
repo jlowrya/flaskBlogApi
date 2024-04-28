@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div>
+    <form method="post">
+Login
+<input type="text" name="username" placeholder="username" value="{{ request.form['username'] }}"/>
+<input type="text" name="password" placeholder="password" value="{{ request.form['password']}}"/>
+<button type="submit">Submit</button>
+    </form>
+   
+</div>
+
+{% endblock %}

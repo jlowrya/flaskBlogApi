@@ -11,4 +11,11 @@
 <p>Created at {{blog.created_at}}</p>
 <p>Last Updated at {{blog.updated_at}}</p>
 
+{{is_authed}}
+
+{% if is_authed %}
+<p>Edit</p> 
+<p>Delete</p>
+{% endif %}
+
 {% endblock %}

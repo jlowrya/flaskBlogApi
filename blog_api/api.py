@@ -1,6 +1,6 @@
 from blog_api.constants import app, db, login_manager
 from blog_api.models import BlogPost, User
-from flask import request, render_template
+from flask import request, render_template, redirect, url_for
 from flask_login import login_user, current_user, login_required, logout_user
 from sqlalchemy import update, and_
 import secrets
@@ -11,10 +11,14 @@ def list_blogs():
     blogs = [{"id":blog.id, "title": blog.title, "subtitle": blog.subtitle, "body": blog.body, "created_at": blog.created_at, "author": blog.author.username} for blog in db.session.execute(db.select(BlogPost)).scalars()]
     return render_template('./blogs.html', blogs=blogs)
 
+@app.get("/blogs/create")
+def new_blog_form():
+    return render_template("new_blog.html")
+
 @app.get('/blogs/<int:blog_id>')
 def get_blog(blog_id):
     res = db.get_or_404(BlogPost, blog_id)
-    res = {
+    blog = {
         "title": res.title,
         "subtitle": res.subtitle, 
         "body": res.body,
@@ -22,17 +26,19 @@ def get_blog(blog_id):
         "updated_at": res.updated_at,
         "author": res.author.username
     }
-    return render_template('./blog.html', blog=res) 
+    print(f"Current user {current_user}")
+    print(f"Is authed {(current_user.is_authenticated and current_user.id==res.author.id)}")
+    return render_template('./blog.html', blog=blog, is_authed=(current_user.is_authenticated and current_user.id==res.author.id))
     
-@app.post("/blogs")
+@app.post("/blogs/create")
 @login_required
 def create_blog():
-    blog_details = request.get_json()
+    blog_details = request.form
     try:
         new_blog = BlogPost(**blog_details, author_id=int(current_user.id))
         db.session.add(new_blog)
         db.session.commit()
-        return {**blog_details, "id": new_blog.id, "created_at": new_blog.created_at}
+        return redirect("/blogs")
     except Exception as e:
         print(e)
         return "Something went wrong"
@@ -86,25 +92,35 @@ def signup():
     db.session.commit()
     return {"username": user_info["username"], "id": new_user.id}
 
+@app.get("/login")
+def get_login():
+    return render_template("./login.html")
+
 @app.post("/login")
 def login():
-    print(f"Secret is {secrets.token_hex()}")
-    username, password = request.get_json().values()
+    username, password = request.form.values()
+    print(f"Username {username}")
+    print(f"password {password}")
     user = User.query.filter(and_(User.username==username, User.password==password)).first()
     if(user):
         #redirect to main page
         login_user(user, force=True)
-        return f"{current_user.username} succesfully logged in"
-    return "Incorrect details"
+        return redirect("/blogs")
+    return redirect(url_for( 'get_login', retry=True))
 
-@app.post("/logout")
+@app.get("/logout")
 @login_required
 def logout():
-    old_user = current_user.username
     logout_user()
-    return f"{old_user} was logged out. New current user is {current_user}"
+    return redirect("/blogs")
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter(User.id==int(user_id)).one()
+
+@app.get("/authstatus")
+def get_auth_status():
+    return {
+        "current_user": None if current_user.is_anonymous else current_user.username
+    }

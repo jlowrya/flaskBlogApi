@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div>
+    <form method="post">
+        Create a new post
+        <input type="text" name="title" placeholder="Title" value="{{ request.form['title'] }}" />
+        <input type="text" name="subtitle" placeholder="Subtitle" value="{{ request.form['subtitle']}}" />
+        <input type="textarea" name="body" placeholder="Blog content" value="{{ request.form['body']}}" />
+        <button type="submit">Submit</button>
+    </form>
+
+</div>
+
+{% endblock %}
