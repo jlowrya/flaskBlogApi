@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 
-{% block content %}
 
-<div>
-<h1>Create a blog</h1>
+{% block title %}
+Edit your blog post
+{% endblock %}
+
+
+{% block content %}
+<h1>Edit your blog</h1>
 <form method="POST">
     <div>
         {{ form.title.label }}:
@@ -20,10 +24,9 @@
     <div>
         {{ form.submit }}
     </div>
-    <a href="{{ url_for( 'list_blogs') }}">Cancel</a>
-
+    <a href="{{ url_for( 'get_blog', blog_id=blog_id ) }}">Cancel</a>
+    
 </form>
 
-</div>
 
 {% endblock %}
