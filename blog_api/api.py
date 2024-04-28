@@ -5,6 +5,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 from sqlalchemy import update, and_
 from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import StringField, SubmitField, TextAreaField
+import random
 import secrets
 
 class BlogForm(FlaskForm):
@@ -24,9 +25,12 @@ class SignupForm(FlaskForm):
     password_repeat = StringField("Confirm password")
     submit = SubmitField("Sign up")
 
-@app.get('/blogs')
+@app.get('/')
 def list_blogs():
     blogs = [{"id":blog.id, "title": blog.title, "subtitle": blog.subtitle, "body": blog.body, "created_at": blog.created_at, "author": blog.author.username} for blog in db.session.execute(db.select(BlogPost)).scalars()]
+    if len(blogs)==0:
+        seed_db()
+        blogs = [{"id":blog.id, "title": blog.title, "subtitle": blog.subtitle, "body": blog.body, "created_at": blog.created_at, "author": blog.author.username} for blog in db.session.execute(db.select(BlogPost)).scalars()]
     return render_template('./blogs.html', blogs=blogs)
 
 @app.get("/blogs/create")
@@ -66,7 +70,7 @@ def create_blog():
 def delete_blog(blog_id):
     res = db.session.execute(BlogPost.__table__.delete().where(and_(BlogPost.id==blog_id, BlogPost.author_id==int(current_user.id))))
     db.session.commit()
-    return redirect("/blogs")
+    return redirect(url_for("list_blogs"))
 
 @app.get("/blogs/<int:blog_id>/edit")
 @login_required
@@ -119,7 +123,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect("/blogs")
+    return redirect(url_for("list_blogs"))
 
 @app.get("/sign-up")
 def sign_up_page():
@@ -153,8 +157,17 @@ def get_auth_status():
     }
 
 
-@app.get("/blogs/seed")
 def seed_db():
+    #only create 2 users for simplicity
+    users = []
+    for i in range(2):
+        user_num = i+1
+        username = f"user{user_num}"
+        password = f"password{user_num}"
+        users.append(User(username=username, password=password))
+    db.session.add_all(users)
+    db.session.commit()
+        
     for i in range(10):
         #the generated id is 1-indexed so this keeps the other info in line with the id
         id = i+1
@@ -162,7 +175,7 @@ def seed_db():
         blog.title = f"Title {id}"
         blog.subtitle = f"Subtitle {id}"
         blog.body = f"Body {id}"
-        blog.author_id = 1
+        blog.author_id = users[0].id if i<5 else users[1].id
         db.session.add(blog)
     db.session.commit()
     return "DB successfully seeded"
